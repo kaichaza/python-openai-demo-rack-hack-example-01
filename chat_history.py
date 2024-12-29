@@ -1,39 +1,23 @@
 import os
 
-import azure.identity
 import openai
 from dotenv import load_dotenv
 
-# Setup the OpenAI client to use either Azure, OpenAI.com, or Ollama API
+# Setup the OpenAI client to use the Azure API
 load_dotenv(override=True)
 API_HOST = os.getenv("API_HOST")
 
 if API_HOST == "azure":
-    token_provider = azure.identity.get_bearer_token_provider(
-        azure.identity.DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-    )
+
     client = openai.AzureOpenAI(
         api_version=os.getenv("AZURE_OPENAI_VERSION"),
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        azure_ad_token_provider=token_provider,
+        api_key=os.getenv("AZURE_AI_PROJECT_API_KEY")
     )
     MODEL_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-elif API_HOST == "ollama":
-    client = openai.OpenAI(
-        base_url=os.getenv("OLLAMA_ENDPOINT"),
-        api_key="nokeyneeded",
-    )
-    MODEL_NAME = os.getenv("OLLAMA_MODEL")
-elif API_HOST == "github":
-    client = openai.OpenAI(base_url="https://models.inference.ai.azure.com", api_key=os.getenv("GITHUB_TOKEN"))
-    MODEL_NAME = os.getenv("GITHUB_MODEL")
-else:
-    client = openai.OpenAI(api_key=os.getenv("OPENAI_KEY"))
-    MODEL_NAME = os.getenv("OPENAI_MODEL")
-
 
 messages = [
-    {"role": "system", "content": "I am a teaching assistant helping with Python questions for Berkeley CS 61A."},
+    {"role": "system", "content": "I am a Valorant coach who can help you improve in the online game of valorant."},
 ]
 
 while True:
@@ -45,7 +29,7 @@ while True:
         model=MODEL_NAME,
         messages=messages,
         temperature=1,
-        max_tokens=400,
+        max_tokens=4000,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
